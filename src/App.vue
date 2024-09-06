@@ -4,7 +4,7 @@
     <!-- Navigation or header section -->
     <header class="flex justify-between p-4 text-white bg-gray-900">
       <h1 class="text-xl">My NFT DApp</h1>
-      <ConnectWallet />
+      <ConnectWallet @wallet-connected="handleWalletConnected" />
     </header>
     <main>
       <div class="flex w-full h-auto flex-rol">
@@ -15,7 +15,7 @@
           <TransferAssets />
         </div>
       </div>
-      <Gallery />
+      <Gallery :walletAddress="walletAddress" />
     </main>
   </div>
 </template>
@@ -32,6 +32,16 @@ export default {
     Gallery,
     MintNFT,
     TransferAssets,
+  },
+  data() {
+    return {
+      walletAddress: null,
+    };
+  },
+  methods: {
+    handleWalletConnected(address) {
+      this.walletAddress = address;
+    },
   },
 };
 </script>

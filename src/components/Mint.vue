@@ -22,8 +22,6 @@ import axios from "axios";
 import { ethers } from "ethers";
 import contractABI from "@/../ContractABI.json";
 
-const contractAddress = process.env.VITE_CONTRACT_ADDRESS;
-
 export default {
   data() {
     return {
@@ -36,40 +34,43 @@ export default {
       this.selectedFile = event.target.files[0];
     },
     async mintNFT() {
+      const contractAddress = process.env.VUE_APP_CONTRACT_ADDRESS
+
       if (!this.selectedFile) {
         alert("Please select a file!");
         return;
       }
+
+      const backendUrl = process.env.VUE_APP_BACKEND_URL;
 
       try {
         // Step 1: Upload the file to the backend (which uploads it to Pinata/IPFS)
         const formData = new FormData();
         formData.append("file", this.selectedFile);
 
-        const response = await axios.post(
-          `${process.env.VITE_PINATA_GATEWAY_URL}/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await axios.post(`${backendUrl}/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-        this.metadataUrl = response.data.url; // Get the metadata URL from the backend
-        console.log("File uploaded to:", this.metadataUrl);
+        const ipfsHash = response.data.IpfsHash;
+        this.metadataUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
 
         // Step 2: Mint the NFT by interacting with the smart contract
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
         const contract = new ethers.Contract(
           contractAddress,
           contractABI,
           signer
         );
 
+        console.log({ contract });
+
         const transaction = await contract.mintNFT(this.metadataUrl);
         await transaction.wait();
+        console.log({ transaction });
         alert("NFT successfully minted!");
       } catch (error) {
         console.error("Error minting NFT:", error);

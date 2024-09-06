@@ -1,12 +1,14 @@
 <template>
   <div class="flex flex-col items-center justify-center h-auto">
     <button
+      v-if="!account"
       @click="connectWallet"
       class="px-6 py-3 text-white bg-blue-500 rounded-lg"
     >
-      Connect to MetaMask 
+      Connect to MetaMask
     </button>
-    <div v-if="account" class="mt-4">
+
+    <div v-if="account" class="p-2 text-white bg-green-500 rounded-lg">
       <p>Connected Account: {{ account }}</p>
     </div>
   </div>
@@ -23,19 +25,25 @@ export default {
   },
   methods: {
     async connectWallet() {
-      if (window.ethereum) {
+      if (typeof window.ethereum !== "undefined") {
         try {
           await window.ethereum.request({ method: "eth_requestAccounts" });
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
-          console.log("Connected address:", address);
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+
+          const walletAddress = await signer.getAddress();
+          this.account = walletAddress;
+          this.$emit("wallet-connected", walletAddress);
         } catch (error) {
           console.error("Error initializing provider:", error);
         }
       } else {
         alert("Please install MetaMask!");
       }
+    },
+    disconnectWallet() {
+      localStorage.removeItem("walletAddress");
+      this.account = null;
     },
   },
 };

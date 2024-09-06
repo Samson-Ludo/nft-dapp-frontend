@@ -29,7 +29,7 @@
 import { ethers } from "ethers";
 import contractABI from "@/../ContractABI.json";
 
-const contractAddress = process.env.VITE_CONTRACT_ADDRESS;
+const contractAddress = process.env.VUE_APP_CONTRACT_ADDRESS
 
 export default {
   data() {
@@ -43,8 +43,8 @@ export default {
       if (!this.toAddress || !this.tokenId)
         return alert("Please provide a valid address and token ID");
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
       const contract = new ethers.Contract(
         contractAddress,
         contractABI,
@@ -52,6 +52,12 @@ export default {
       );
 
       try {
+        // validate address
+        if (!ethers.isAddress(this.toAddress)) {
+          alert("Address might be invalid!");
+          return;
+        }
+
         const tx = await contract.transferFrom(
           signer.getAddress(),
           this.toAddress,
@@ -61,7 +67,7 @@ export default {
         alert("NFT Transferred Successfully!");
       } catch (err) {
         console.error(err);
-        alert("Error transferring NFT");
+        alert("Error transferring NFT. Check Address and Token ID");
       }
     },
   },

@@ -8,33 +8,55 @@
       </div>
     </div>
     <div class="text-center" v-else>
-      <p>No NFTs found for this account.</p>
+      <p>No NFTs found.</p>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    walletAddress: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       nfts: [],
     };
   },
-  async mounted() {
-    const account = ""; /* The account you fetched earlier */
-    // Example: Using OpenSea API to get NFTs
-    const response = await fetch(
-      `https://api.opensea.io/api/v1/assets?owner=${account}`
-    );
-    const data = await response.json();
-    this.nfts =
-      data?.assets?.length > 0
-        ? data?.assets?.map((nft) => ({
-            id: nft.id,
-            image: nft.image_url,
-            name: nft.name,
-          }))
-        : [];
+  watch: {
+    walletAddress: "fetchNFTs",
+  },
+  methods: {
+    async fetchNFTs() {
+      if (!this.walletAddress) return;
+      try {
+        const account = this.walletAddress;
+        // Using OpenSea API to get NFTs
+        const response = await fetch(
+          `https://testnets-api.opensea.io/api/v2/chain/sepolia/account/${account}/nfts`
+        );
+        const data = await response.json();
+
+        this.nfts =
+          data?.nfts?.length > 0
+            ? data?.nfts?.map((nft) => ({
+                id: nft.identifier,
+                image: nft.image_url,
+                name: nft.name,
+              }))
+            : [];
+        alert("NFT fetched successfully!");
+      } catch (error) {
+        alert("Error fetching NFTs");
+        console.error("Error fetching NFTs:", error);
+      }
+    },
+    async mounted() {
+      this.fetchNFTs();
+    },
   },
 };
 </script>

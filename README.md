@@ -49,7 +49,8 @@ Follow these steps to set up and run the application locally.
 3. **Configure Environment Variables**
    Create a `.env` file in the project root directory and add your contract address:
    ```bash
-   VITE_CONTRACT_ADDRESS=your_contract_address
+   VUE_APP_CONTRACT_ADDRESS=your-contract-address
+   VUE_APP_BACKEND_URL=your-backend-url
    ```
 
 4. **Run the Application**
@@ -82,7 +83,8 @@ Follow these steps to set up and run the application locally.
 
 #### 3. **Environment Variables on Netlify**
    - In your Netlify dashboard, go to **Site Settings > Build & Deploy > Environment**.
-   - Add the `VITE_CONTRACT_ADDRESS` environment variable and set it to your smart contract address.
+   - Add the `VUE_APP_CONTRACT_ADDRESS` environment variable and set it to your smart contract address.
+   - Add the `VUE_APP_BACKEND_URL` environment variable and set it to your backend url for upload new assets to be minted.
 
 ### Notes on Deployment
 - The front-end is deployed to Netlify and can be easily accessed via the provided Netlify URL.
@@ -98,3 +100,7 @@ Follow these steps to set up and run the application locally.
 - Add error handling for transaction failures.
 - Support multiple wallet providers (e.g., WalletConnect).
 - Improve NFT gallery UI and add pagination.
+
+## Author
+
+[Samson Okaludo](https://www.linkedin.com/in/samson-okaludo)
