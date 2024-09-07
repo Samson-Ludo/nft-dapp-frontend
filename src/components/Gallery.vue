@@ -50,8 +50,7 @@ export default {
             : [];
         alert("NFT fetched successfully!");
       } catch (error) {
-        alert("Error fetching NFTs");
-        console.error("Error fetching NFTs:", error);
+        alert(`Error fetching NFTs/ Error message: ${error.shortMessage}`);
       }
     },
     async mounted() {

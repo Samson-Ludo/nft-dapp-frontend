@@ -35,7 +35,7 @@ export default {
           this.account = walletAddress;
           this.$emit("wallet-connected", walletAddress);
         } catch (error) {
-          console.error("Error initializing provider:", error);
+          alert(`Error connecting wallet.\nError message: ${error.shortMessage}`)
         }
       } else {
         alert("Please install MetaMask!");

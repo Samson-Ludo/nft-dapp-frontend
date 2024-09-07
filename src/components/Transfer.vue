@@ -17,11 +17,13 @@
       />
     </div>
     <button
+      v-if="!isLoading"
       @click="transferNFT"
       class="px-6 py-3 text-white bg-red-500 rounded-lg"
     >
       Transfer NFT
     </button>
+    <p v-if="isLoading">Transfering...</p>
   </div>
 </template>
 
@@ -29,11 +31,12 @@
 import { ethers } from "ethers";
 import contractABI from "@/../ContractABI.json";
 
-const contractAddress = process.env.VUE_APP_CONTRACT_ADDRESS
+const contractAddress = process.env.VUE_APP_CONTRACT_ADDRESS;
 
 export default {
   data() {
     return {
+      isLoading: false,
       toAddress: "",
       tokenId: "",
     };
@@ -43,18 +46,19 @@ export default {
       if (!this.toAddress || !this.tokenId)
         return alert("Please provide a valid address and token ID");
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        contractABI,
-        signer
-      );
-
       try {
+        this.isLoading = true;
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
         // validate address
         if (!ethers.isAddress(this.toAddress)) {
           alert("Address might be invalid!");
+          this.isLoading = false;
           return;
         }
 
@@ -65,9 +69,10 @@ export default {
         );
         await tx.wait();
         alert("NFT Transferred Successfully!");
-      } catch (err) {
-        console.error(err);
-        alert("Error transferring NFT. Check Address and Token ID");
+        this.isLoading = false;
+      } catch (error) {
+        alert(`Error transferring NFT.\nError message: ${error.shortMessage}`);
+        this.isLoading = false;
       }
     },
   },
